@@ -1,0 +1,17 @@
+html,body{height:100%;margin:0;padding:0}
+* { -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
+
+#cbz-app-container{background:magenta;height:100%}
+#cbz-app-toolbar {background:#EEE;height:30px;width:100%;position:absolute;top:0;padding:0;z-index:1}
+#cbz-app-body {background:hotpink;border-top: 30px solid transparent;height:100%;position:relative;}
+#cbz-app-browser {background:white;position:absolute;top:0;left:0;width:33.3%;height:100%;}
+#cbz-app-viewer {background:#444;position:absolute;top:0;left:33.3%;width:33.4%;height:100%;}
+#cbz-app-queue {background:#DDD;position:absolute;top:0;left:66.7%;width:33.3%;height:100%;}
+
+#cbz-app-browser {overflow:auto}
+.browser-item {position:relative;white-space:nowrap;}
+.browser-item-name, .browser-item-stat {cursor: pointer;padding-left:24px;font-size:13px;font-family:sans-serif;white-space:nowrap;}
+.browser-item-icon {cursor: pointer;position:absolute;top:0;left:0}
+.browser-directory > .browser-item-icon {background: url(/directory-20x20.png);width:20px;height:20px;}
+.browser-file > .browser-item-icon {background: url(/file-20x20.png);width:20px;height:20px;}
+.browser-directory .children{padding-left:24px;}

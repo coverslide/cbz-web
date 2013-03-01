@@ -1,0 +1,11 @@
+#!/usr/bin/env node
+var http = require('http')
+var cbz_web = require('../')
+var path = require('path')
+var config = require(path.resolve('config.json'))
+
+var server = http.createServer()
+
+cbz_web(config.root).bind(server)
+
+server.listen(config.port, config.host)

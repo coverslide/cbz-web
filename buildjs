@@ -1,0 +1,3 @@
+wd=`dirname $0`
+PATH=$wd/node_modules/.bin:$PATH
+browserify ./scripts/index.js -o ./public/script.js
