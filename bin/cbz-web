@@ -6,6 +6,6 @@ var config = require(path.resolve('config.json'))
 
 var server = http.createServer()
 
-cbz_web(config.root).bind(server)
+cbz_web(config.root, server, config.path)
 
-server.listen(config.port, config.host)
+server.listen(config.socket || config.port, config.host)
