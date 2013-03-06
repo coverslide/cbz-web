@@ -1,5 +1,6 @@
 {
   "root" : "/home/richard/misc/Comics",
   "path" : "/comics",
+  "db"   : "db",
   "port" : 8080
 }

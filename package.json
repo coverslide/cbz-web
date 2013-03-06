@@ -1,11 +1,14 @@
 {
   "name": "cbz-web",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Simple remote cbz viewer",
   "main": "index.js",
   "dependencies": {
     "send": "~0.1.0",
-    "filesocket-server": "0.0.0"
+    "inflate-stream": "0.1.0",
+    "pkzip-parser": "0.1.0",
+    "levelup": "~0.6.2",
+    "async": "~0.2.6"
   },
   "devDependencies": {
     "domready": "~0.2.11",

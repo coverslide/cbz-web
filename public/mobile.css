@@ -17,10 +17,10 @@ html,body{height:100%;margin:0;padding:0}
 .queue #cbz-app-queue,
 .browser.queue #cbz-app-viewer {width:100%;left:0}
 
-.browser #cbz-app-browser {height:33.3%}
-.browser #cbz-app-viewer {top:33.3%;height:66.7%}
+.browser #cbz-app-browser {height:30%}
+.browser #cbz-app-viewer {top:30%;height:70%}
 .browser #cbz-app-queue {top:100%;height:0%}
-.queue #cbz-app-viewer {height:66.7%}
-.queue #cbz-app-queue {height:33.3%;top:66.7%}
-.browser.queue #cbz-app-viewer {height:33.4%}
+.queue #cbz-app-viewer {height:70%}
+.queue #cbz-app-queue {height:30%;top:70%}
+.browser.queue #cbz-app-viewer {height:40%}
 
