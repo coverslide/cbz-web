@@ -1,12 +1,15 @@
-html,body{height:100%;margin:0;padding:0}
-* { -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
-
-#cbz-app-container{background:magenta;height:100%}
-#cbz-app-toolbar {background:#EEE;height:30px;width:100%;position:absolute;top:0;padding:0;z-index:1}
-#cbz-app-body {height:100%}
-#cbz-app-browser {background:white;position:absolute;top:0%;left:0;width:100%;height: 0%;-webkit-transition:top 1s, height 1s}
-#cbz-app-viewer {background:#444;position:absolute;top: 0%;left:0;width:100%;height: 100%;-webkit-transition: top 1s, height 1s}
-#cbz-app-queue {background:#DDD;position:absolute;top: 100%;left:0;width:100%;height: 0%;-webkit-transition: top 1s, height 1s}
+#cbz-app-browser {top:0%;left:0;width:100%;height: 0%;
+  -webkit-transition:top .5s, height .5s;
+  -moz-transition:top .5s, height .5s;
+}
+#cbz-app-queue {top: 0%;left:0;width:100%;height: 0%;
+  -webkit-transition: top .5s, height .5s;
+  -moz-transition: top .5s, height .5s;
+}
+#cbz-app-viewer {top: 0%;left:0;width:100%;height: 100%;
+  -webkit-transition: top .5s, height .5s;
+  -moz-transition: top .5s, height .5s;
+}
 
 /* override base style changes */
 .browser #cbz-app-browser,
@@ -15,12 +18,15 @@ html,body{height:100%;margin:0;padding:0}
 .queue #cbz-app-browser,
 .queue #cbz-app-viewer,
 .queue #cbz-app-queue,
-.browser.queue #cbz-app-viewer {width:100%;left:0}
+.browser.queue #cbz-app-browser,
+.browser.queue #cbz-app-queue,
+.browser.queue #cbz-app-viewer {width:100%;left:0%;top:0%;}
 
 .browser #cbz-app-browser {height:30%}
+.browser #cbz-app-queue {top:30%;height:0%}
 .browser #cbz-app-viewer {top:30%;height:70%}
-.browser #cbz-app-queue {top:100%;height:0%}
-.queue #cbz-app-viewer {height:70%}
-.queue #cbz-app-queue {height:30%;top:70%}
-.browser.queue #cbz-app-viewer {height:40%}
+.queue #cbz-app-queue {height:30%;top:0%}
+.queue #cbz-app-viewer {top:30%;height:70%}
+.browser.queue #cbz-app-queue {top:30%}
+.browser.queue #cbz-app-viewer {top:60%;height:40%}
 

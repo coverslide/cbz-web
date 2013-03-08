@@ -8,11 +8,13 @@
     "inflate-stream": "0.1.0",
     "pkzip-parser": "0.1.0",
     "levelup": "~0.6.2",
-    "async": "~0.2.6"
+    "async": "~0.2.6",
+    "ws": "~0.4.25",
+    "mkee": "0.0.0"
   },
   "devDependencies": {
     "domready": "~0.2.11",
-    "browserify": "~2.1.0",
+    "browserify": "~2.4.3",
     "global": "~0.1.5"
   },
   "scripts": {
