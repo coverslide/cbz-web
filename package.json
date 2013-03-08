@@ -5,7 +5,6 @@
   "main": "index.js",
   "dependencies": {
     "send": "~0.1.0",
-    "inflate-stream": "0.1.0",
     "pkzip-parser": "0.2.0",
     "levelup": "~0.6.2",
     "async": "~0.2.6",
