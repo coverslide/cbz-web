@@ -43,7 +43,7 @@ user-select: none;}
 
 #cbz-app-queue .current-file-title {font-weight:bold;color:#666;text-transform:uppercase}
 #cbz-app-queue .current-file-contents {padding: 10px}
-#cbz-app-queue .current-file-list li {position:relative;cursor:pointer;padding-right:24px;}
+#cbz-app-queue .current-file-list li {position:relative;cursor:pointer;padding-right:24px;white-space:nowrap}
 #cbz-app-queue .current-file-list li.selected {background:#aaf}
 
 .toolbar-left {float:left}

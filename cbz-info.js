@@ -4,9 +4,15 @@ var fs = require('fs')
 var path = require('path')
 var parseUrl = require('url').parse
 
-var PkzipParser = require('pkzip-parser')
+require('sort_by').bindToNative()
+
+//var PkzipParser = require('pkzip-parser')
 
 module.exports = CbzInfo
+
+var END_SIG   = 0x06054b50
+var CD_SIG    = 0x02014b50
+var FILE_SIG  = 0x04034b50
 
 function CbzInfo(root){
 
@@ -30,9 +36,68 @@ function CbzInfo(root){
           return res.end()
         }
 
-        res.setHeader('ETag', ETag)
 
-        var parser = new PkzipParser()
+        //let's use the FD and just check the central directory
+        fs.open(filepath, 'r', function(err, fd){
+          if(err) return sendError(err)
+          var endOffset = stat.size - 22
+          var endData =  new Buffer(22)
+          fs.read(fd, endData, 0, 22, endOffset, function(err, bytes){
+            if(err) return sendError(err)
+            var signature = endData.readUInt32LE(0,true)
+            if(signature != END_SIG) return sendError("Invalid End signature")
+            var cdOffset = endData.readUInt32LE(16, true)
+            var entryCount = endData.readUInt16LE(10, true)
+            var entries = []
+            var entriesCompleted = 0
+            var lastFile = null
+
+            readNext()
+
+            function readNext(){
+              var cdData = new Buffer(46)
+              fs.read(fd, cdData, 0, 46, cdOffset, function(err, bytes){
+                var signature = cdData.readUInt32LE(0, true)
+                if(signature != CD_SIG) return sendError("Invalid CD signature")
+                var filenameLength = cdData.readUInt16LE(28, true)
+                var extrafieldLength = cdData.readUInt16LE(30, true)
+                var commentLength = cdData.readUInt16LE(32, true)
+                var dataSize = cdData.readUInt32LE(20, true) 
+                var fileOffset = cdData.readUInt32LE(42, true)
+
+                var varLength = filenameLength + extrafieldLength + commentLength
+                var extraData = new Buffer(varLength)
+                fs.read(fd, extraData, 0, varLength, cdOffset + 46, function(err, bytes){
+                  if(err) return sendError(Err)
+                  cdOffset += 46 + varLength
+                  var filename = extraData.slice(0, filenameLength).toString()
+                  if(lastFile)
+                    lastFile.end = fileOffset - 1
+                  lastFile = {filename:filename, offset:fileOffset}
+                  entries.push(lastFile)
+                  if(entries.length < entryCount)
+                    readNext()
+                  else{
+                    lastFile.end = endOffset - 1
+                    printEntries()
+                  }
+                })
+              })
+            }
+
+            function printEntries(){
+              res.setHeader('ETag', ETag)
+              entries
+                .sort_by(function(e){return e.filename})
+                .forEach(function(e){res.write(JSON.stringify(e) + '\n')})
+              res.end()
+            }
+          })
+        })
+
+        return
+
+        var parser = null//new PkzipParser()
         var fstream = fs.createReadStream(filepath)
 
         var files = []

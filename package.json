@@ -7,7 +7,8 @@
     "send": "~0.1.0",
     "pkzip-parser": "0.2.0",
     "mkee": "0.0.0",
-    "mime": "~1.2.9"
+    "mime": "~1.2.9",
+    "sort_by": "0.0.2"
   },
   "devDependencies": {
     "domready": "~0.2.11",
