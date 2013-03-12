@@ -86,6 +86,7 @@ function CbzInfo(root){
             }
 
             function printEntries(){
+              fs.close(fd)
               res.setHeader('ETag', ETag)
               entries
                 .sort_by(function(e){return e.filename})
