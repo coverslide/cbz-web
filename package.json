@@ -8,12 +8,13 @@
     "pkzip-parser": "0.2.0",
     "mkee": "0.0.0",
     "mime": "~1.2.9",
-    "sort_by": "0.0.2"
+    "sort_by": "0.0.2",
+    "domready": "~0.2.11",
+    "global": "~0.1.5",
+    "cbz-browser-app": "git+https://github.com/coverslide/cbz-browser-app"
   },
   "devDependencies": {
-    "domready": "~0.2.11",
-    "browserify": "~2.4.3",
-    "global": "~0.1.5"
+    "browserify": "~2.4.3"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
