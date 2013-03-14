@@ -85,7 +85,7 @@ find "$wd" -name "*.cbr" | sort | while read cbr ; do
   tempdir=`mktemp -d`
   unrar x -rv "$cbr" "$tempdir"
   cd $tempdir
-  zip -v -r "$cbz" *
+  zip -v -r "$cbz" -- *
   cd $cwd
   rm -rf "$tempdir"
 done
