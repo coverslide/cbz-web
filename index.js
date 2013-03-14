@@ -10,20 +10,22 @@ module.exports = function(config, server){
   if(!config.root)
     throw new Error('Root directory not specified')
 
-  var cbzFile = new CbzFile(config.root)
+  var cbzFile = new CbzFile(config.root, config.decompress)
   var cbzInfo = new CbzInfo(config.root, config.db)
   var jsonDir = new JsonDir(config.root)
 
   server.on('request', function(req, res){
     //check for gzip encoding
-    var encodings = req.headers['accept-encoding']
-    if(encodings){
-      var hasGzip = encodings.split(',').indexOf('gzip') > -1
-    }
-    if(!hasGzip){
-      return send(req, '/nogzip.html')
-        .root(__dirname + '/public')
-        .pipe(res)
+    if(!config.decompress){
+      var encodings = req.headers['accept-encoding']
+      if(encodings){
+        var hasGzip = encodings.split(',').indexOf('gzip') > -1
+      }
+      if(!hasGzip){
+        return send(req, '/nogzip.html')
+          .root(__dirname + '/public')
+          .pipe(res)
+      }
     }
 
     if(req.url.match(/^\/cbz-file/)){

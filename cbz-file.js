@@ -13,7 +13,7 @@ var zlib = require('zlib')
 
 module.exports = CbzFile
 
-function CbzFile(root){
+function CbzFile(root, decompress){
   return function(req, res){
     var url = parseUrl(req.url, true)
     var filename = decodeURIComponent(url.query.path)
@@ -32,7 +32,6 @@ function CbzFile(root){
         }
 
 
-        var decompress = url.query.decompress
         var offset = +url.query.offset
         var end = +url.query.end
         var parser = new PkzipParser()
@@ -48,14 +47,15 @@ function CbzFile(root){
             stream.pipe(res)
             //stream.on('end', end)
           } else if(header.compressionType == 'deflate'){
-            if(decompress){
+            var encodings = req.headers["accept-encoding"] || ""
+            if(decompress){ // && !encodings.match(/\bgzip\b/)){
               res.setHeader('ETag', ETag)
               res.setHeader('Content-Type', mime.lookup(header.fileName))
               res.setHeader('Content-Length', header.uncompressedSize)
-              var deflate = zlib.createDeflateRaw()
-              stream.pipe(deflate)
-              deflate.pipe(res)
-              //deflate.on('end', end)
+              var inflate = zlib.createInflateRaw()
+              stream.pipe(inflate)
+              inflate.pipe(res)
+              //inflate.on('end', end)
             } else {
               //Aww Yiss, wrap the compressed data in a gzip header
               var headerBuffer = new Buffer(10)// + header.fileName.length + 1)
