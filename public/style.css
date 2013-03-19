@@ -7,7 +7,7 @@ html,body{height:100%;margin:0;padding:0;font-size:13px;font-family:sans-serif;
 user-select: none;}
 
 #cbz-app-container{background:magenta;height:100%}
-#cbz-app-toolbar {background:#EEE;height: 30px;width:100%;position:absolute;top:0;padding:0;z-index:5;box-shadow:0 0 5px #444;line-height: 30px;vertical-align: middle;padding: 0 10px;box-sizing: border-box;}
+#cbz-app-toolbar {background:#EEE;height: 30px;width:100%;position:absolute;top:0;padding:0;z-index:5;box-shadow:0 0 5px #444;line-height: 30px;vertical-align: middle;padding: 0 10px;box-sizing: border-box;-moz-box-sizing: border-box; -webkit-box-sizing: border-box;}
 #cbz-app-body {background:hotpink;border-top: 30px solid transparent;height:100%;position:relative;-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;}
 #cbz-app-browser {background:white;position:absolute;top:0;left:0%;width:0%;height:100%;z-index:4;box-shadow:0 0 5px #444;
   -webkit-transition:width .5s, left .5s;
@@ -59,6 +59,7 @@ user-select: none;}
 }
 */
 
+#cbz-app-viewer .image {display:block}
 #cbz-app-viewer .image.zoom {width:200%}
 #cbz-app-viewer .viewer-text {background:white}
 
