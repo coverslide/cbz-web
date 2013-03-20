@@ -92,3 +92,6 @@ user-select: none;}
     background: -ms-linear-gradient(top, #ccc, #ddd);
 }
 
+.btn[disabled] {
+  opacity: 0.5;
+}
