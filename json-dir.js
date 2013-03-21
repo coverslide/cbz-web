@@ -31,7 +31,7 @@ function JsonDir(root){
               var childname = path.join(filepath, file)
               fs.stat(childname, function(err, stat){
                 if(err) data.error = err
-                else data.stat = stat
+                else data.size = stat.size
                 if(stat) data.isdir = stat.isDirectory()
                 if(chunked){
                   res.write(JSON.stringify(data) + '\n')
