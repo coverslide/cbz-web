@@ -6,7 +6,7 @@ fi
 cwd=`pwd`
 
 #convert .zip to .cbz
-find "$wd" -name "*.zip" | sort | while read zip ; do
+find -L "$wd" -name "*.zip" | sort | while read zip ; do
   start_directory=`dirname "$zip"`
   cbzfile=`basename "$zip" .zip`.cbz
   cbz="$start_directory/$cbzfile"
@@ -15,7 +15,7 @@ find "$wd" -name "*.zip" | sort | while read zip ; do
 done
 
 #and convert rar to cbr
-find "$wd" -name "*.rar" | sort | while read rar ; do
+find -L "$wd" -name "*.rar" | sort | while read rar ; do
   start_directory=`dirname "$rar"`
   cbrfile=`basename "$rar" .rar`.cbr
   cbr="$start_directory/$cbrfile"
@@ -23,7 +23,7 @@ find "$wd" -name "*.rar" | sort | while read rar ; do
   mv -v "$rar" "$cbr"
 done
 
-find "$wd" -iname "*.cbr" | sort | while read rar ; do
+find  -L "$wd" -iname "*.cbr" | sort | while read rar ; do
   start_directory=`dirname "$rar"`
   ext=`grep -o '\.[^.]\+$'<<<"$rar"`
   if [ "$ext" != ".cbr" ] ; then
@@ -35,7 +35,7 @@ find "$wd" -iname "*.cbr" | sort | while read rar ; do
 done
 
 #make sure solid rars are converted, most readers have problems with solid rars
-find "$wd" -name "*.cbr" | sort | while read cbr ; do
+find -L "$wd" -name "*.cbr" | sort | while read cbr ; do
   start_directory=`dirname "$cbr"`
   cbzfile=`basename "$cbr" .cbr`.cbz
   cbz="$start_directory/$cbzfile"

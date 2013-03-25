@@ -22,6 +22,7 @@ function CbzInfo(root){
     var filename = decodeURIComponent(url.query.path)
     var pathname = path.normalize('/' + filename)
     var filepath = path.join(root, pathname)
+    var fd 
 
     var chunked = url.query.chunked
 
@@ -29,17 +30,16 @@ function CbzInfo(root){
       if(err) sendError(err, err.name == 'NotFoundError' && 404)
       else if(!stat.isFile()) sendError('Not a file', 400)
       else{
-      
-        var ETag = stat.size.toString(16) + '-' + (+stat.mtime).toString(16)
+        var ETag = 'v3-' + stat.size.toString(16) + '-' + (+stat.mtime).toString(16)
         if(req.headers['if-none-match'] == ETag){
           res.statusCode = 304
           return res.end()
         }
 
-
         //let's use the FD and just check the central directory
-        fs.open(filepath, 'r', function(err, fd){
+        fs.open(filepath, 'r', function(err, _fd){
           if(err) return sendError(err)
+          fd = _fd
           var endOffset = stat.size - 22
           var endData =  new Buffer(22)
           fs.read(fd, endData, 0, 22, endOffset, function(err, bytes){
@@ -50,7 +50,6 @@ function CbzInfo(root){
             var entryCount = endData.readUInt16LE(10, true)
             var entries = []
             var entriesCompleted = 0
-            var lastFile = null
 
             readNext()
 
@@ -69,18 +68,13 @@ function CbzInfo(root){
                 var extraData = new Buffer(varLength)
                 fs.read(fd, extraData, 0, varLength, cdOffset + 46, function(err, bytes){
                   if(err) return sendError(Err)
-                  cdOffset += 46 + varLength
                   var filename = extraData.slice(0, filenameLength).toString()
-                  if(lastFile)
-                    lastFile.end = fileOffset - 1
-                  lastFile = {filename:filename, offset:fileOffset}
-                  entries.push(lastFile)
+                  entries.push({filename:filename, cd:cdOffset})
+                  cdOffset += 46 + varLength
                   if(entries.length < entryCount)
                     readNext()
-                  else{
-                    lastFile.end = endOffset - 1
+                  else
                     printEntries()
-                  }
                 })
               })
             }
@@ -95,38 +89,13 @@ function CbzInfo(root){
             }
           })
         })
-
-        return
-
-        var parser = null//new PkzipParser()
-        var fstream = fs.createReadStream(filepath)
-
-        var files = []
-
-        parser.on('file', function(header, position){
-          var data = {header:header,position:position} 
-          if(chunked){
-            res.write(JSON.stringify(data)+'\n')
-          } else {
-            files.push(data)
-          }
-        })
-
-        parser.on('end', function(){
-          if(!chunked){
-            res.write(JSON.stringify(files))
-          }
-          res.end()
-        })
-
-        fstream.pipe(parser)
       }
     })
 
     function sendError(err, code){
+      if(fd) fs.close(fd)
       res.statusCode = code || 500
       res.end(err.message || err)
     }
   }
 }
-

@@ -7,8 +7,6 @@ var parseUrl = require('url').parse
 var path = require('path')
 var mime = require('mime')
 
-//var PkzipParser = require('pkzip-parser')
-
 var zlib = require('zlib')
 
 module.exports = CbzFile
@@ -19,62 +17,49 @@ function CbzFile(root, decompress){
     var filename = decodeURIComponent(url.query.path)
     var pathname = path.normalize('/' + filename)
     var filepath = path.join(root, pathname)
+    var fd
 
     fs.stat(filepath, function(err, stat){
       if(err) sendError(err, err.name == 'ENOENT' && 404)
       else if(stat.isDirectory()) sendError('Path is directory')
       else {
 
-        var ETag = stat.size.toString(16) + '-' + (+stat.mtime).toString(16)
+        var ETag = 'v3-' + stat.size.toString(16) + '-' + (+stat.mtime).toString(16)
         if(req.headers['if-none-match'] == ETag){
           res.statusCode = 304
           return res.end()
         }
 
-        var offset = +url.query.offset
-        var end = +url.query.end
+        var cdOffset = +url.query.cd
 
-        fs.open(filepath, 'r', function(err, fd){
+        fs.open(filepath, 'r', function(err, _fd){
           if(err) return sendError(err)
-          var header = new Buffer(30)
-          fs.read(fd, header, 0, 30, offset, function(err){
+          fd = _fd
+          var cdHeader = new Buffer(46)
+          fs.read(fd, cdHeader, 0, 46, cdOffset, function(err){
             if(err) return sendError(err)
-            var signature = header.readUInt32LE(0, true)
-            if(signature != 0x04034b50) return sendError('Invalid file offset')
-            var flags = header.readUInt16LE(6, true)
-            var filenameLength = header.readUInt16LE(26, true)
-            var extrafieldLength = header.readUInt16LE(28, true)
-            var headerSize = 30 + filenameLength + extrafieldLength
+            var signature = cdHeader.readUInt32LE(0, true)
+            if(signature != 0x02014b50) return sendError('Invalid cd signature')
+            var offset = cdHeader.readUInt32LE(42, true)
+            var crc32 = cdHeader.readUInt32LE(16, true)
+            var csize = cdHeader.readUInt32LE(20, true)
+            var usize = cdHeader.readUInt32LE(24, true)
+            var header = new Buffer(30)
 
-            var crc32, csize, usize
-            if(flags & 0x8){//data descriptor is present, therefore usize & csize will be 0 in the header
-              //we could also use the CD for this data
-              var dd = new Buffer(12)
-              var ddStart = offset + headerSize + end
-              fs.read(fd, dd, 0, 12, ddStart, function(){
-                var offset = 4
-                var ddSig = dd.readUInt32LE(0, true)
-                //signature is optional, but that doesn't help me much
-                if(ddSig != 0x08074b50) sendError('Data Descriptor signature not present')//offset -= 4
-                crc32 = dd.readUInt32LE(offset, true)
-                csize = dd.readUInt32LE(offset + 4, true)
-                usize = dd.readUInt32LE(offset + 8, true)
-                afterRead()
-              })
-            } else {
-              crc32 = header.readUInt32LE(14, true)
-              csize = header.readUInt32LE(18, true)
-              usize = header.readUInt32LE(22, true)
-              afterRead()
-            }
+            fs.read(fd, header, 0, 30, offset, function(err){
+              if(err) return sendError(err)
+              var signature = header.readUInt32LE(0, true)
+              if(signature != 0x04034b50) return sendError('Invalid file offset')
+              var filenameLength = header.readUInt16LE(26, true)
+              var extrafieldLength = header.readUInt16LE(28, true)
+              var headerSize = 30 + filenameLength + extrafieldLength
 
-            function afterRead(){
               var compressionId = header.readUInt16LE(8, true)
               var fnBuf = new Buffer(filenameLength)
               fs.read(fd, fnBuf, 0, filenameLength, offset + 30, function(err){
                 if(err) return sendError(err)
                 var cfilename = fnBuf.toString()
-                var stream = fs.createReadStream(null, {fd:fd, start: offset + headerSize, end: end})
+                var stream = fs.createReadStream(null, {fd:fd, start: offset + headerSize, end: offset + headerSize + csize})
                 if(compressionId == 0){// uncompressed
                   res.setHeader('ETag', ETag)
                   res.setHeader('Content-Type', mime.lookup(cfilename))
@@ -120,13 +105,15 @@ function CbzFile(root, decompress){
                   }
                 }
               })
-            }
+            })
           })
         })
       }
     })
 
     function sendError(err, code){
+      if(fd)
+        fs.close(fd)
       res.statusCode = code || 500
       res.write(err.message || err)
       res.end()
