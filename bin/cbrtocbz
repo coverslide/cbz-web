@@ -65,7 +65,7 @@ find -L "$wd" -name "*.cbr" | sort | while read cbr ; do
     7z x "$cbz" -o$temp1 >& /dev/null
     7z x "$cbr" -o$temp2 >& /dev/null
     
-    diff=`diff $temp1 $temp2`
+    diff=`diff -r $temp1 $temp2`
     isdiff=$?
 
     if [ "$isdiff" = "0" ] ; then
@@ -83,9 +83,21 @@ find -L "$wd" -name "*.cbr" | sort | while read cbr ; do
     fi
   fi
   tempdir=`mktemp -d`
-  unrar x -rv "$cbr" "$tempdir"
-  cd $tempdir
-  zip -v -r "$cbz" -- *
+  unrar x -idq -rv "$cbr" "$tempdir"
+  rarok=$?
+  if [ $rarok = 0 ] ; then
+    cd $tempdir
+    zip -q -v -r "$cbz" -- *
+    zipok=$?
+    if [ $zipok = 0 ] ; then
+      #rm "$cbr"
+      echo "# FINISHED: $cbr"
+    else
+      echo "#### #### #### ZIP NOT OK : $cbz #### #### ####"
+    fi
+  else
+    echo "#### #### #### RAR NOT OK : $cbr #### #### ####"
+  fi
   cd $cwd
   rm -rf "$tempdir"
 done
