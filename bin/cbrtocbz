@@ -90,7 +90,7 @@ find -L "$wd" -name "*.cbr" | sort | while read cbr ; do
     zip -q -v -r "$cbz" -- *
     zipok=$?
     if [ $zipok = 0 ] ; then
-      #rm "$cbr"
+      rm "$cbr"
       echo "# FINISHED: $cbr"
     else
       echo "#### #### #### ZIP NOT OK : $cbz #### #### ####"
