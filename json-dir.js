@@ -4,6 +4,8 @@ var fs = require('fs')
 var path = require('path')
 var parseUrl = require('url').parse
 
+require('sort_by').bindToNative()
+
 module.exports = JsonDir
 
 function JsonDir(root){
@@ -22,6 +24,9 @@ function JsonDir(root){
         var files = []
         fs.readdir(filepath, function(err, children){
           if(err) sendError(err)
+          children = children.sort_by(function(f){
+            return f.split(/([0-9]+)/g).map(function(n){return +n == n ? +n : n})
+          }).reverse()
           process()
           function process(){
             var file = children.pop()
