@@ -85,18 +85,19 @@ find -L "$wd" -name "*.cbr" | sort | while read cbr ; do
   tempdir=`mktemp -d`
   unrar x -idq -rv "$cbr" "$tempdir"
   rarok=$?
-  if [ $rarok = 0 ] ; then
-    cd $tempdir
-    zip -q -v -r "$cbz" -- *
-    zipok=$?
-    if [ $zipok = 0 ] ; then
-      rm "$cbr"
-      echo "# FINISHED: $cbr"
-    else
-      echo "#### #### #### ZIP NOT OK : $cbz #### #### ####"
-    fi
-  else
+  if [ $rarok != 0 ] ; then
     echo "#### #### #### RAR NOT OK : $cbr #### #### ####"
+  fi
+  cd $tempdir
+  zip -q -v -r "$cbz" -- *
+  zipok=$?
+  if [ $zipok = 0 ] ; then
+    if [ $zipok = 0  ] ; then
+      rm -v "$cbr"
+    fi
+    echo "# FINISHED: $cbr"
+  else
+    echo "#### #### #### ZIP NOT OK : $cbz #### #### ####"
   fi
   cd $cwd
   rm -rf "$tempdir"
