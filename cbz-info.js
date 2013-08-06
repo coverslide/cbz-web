@@ -83,7 +83,7 @@ function CbzInfo(root){
               fs.close(fd)
               res.setHeader('ETag', ETag)
               entries
-                .sort_by(function(e){return e.filename})
+                .sort_by(function(e){return e.filename.toLowerCase()})
                 .forEach(function(e){res.write(JSON.stringify(e) + '\n')})
               res.end()
             }
