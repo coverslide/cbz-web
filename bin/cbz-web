@@ -2,7 +2,8 @@
 var http = require('http')
 var cbz_web = require('../')
 var path = require('path')
-var config = require(path.resolve('config.json'))
+var configFile = process.argv[2] || 'config.json'
+var config = require(path.resolve(configFile))
 
 var server = http.createServer()
 
