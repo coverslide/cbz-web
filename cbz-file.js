@@ -11,7 +11,7 @@ var zlib = require('zlib')
 
 module.exports = CbzFile
 
-function CbzFile(root, decompress){
+function CbzFile(root){
   return function(req, res){
     var url = parseUrl(req.url, true)
     var filename = decodeURIComponent(url.query.path)
@@ -58,15 +58,16 @@ function CbzFile(root, decompress){
               var fnBuf = new Buffer(filenameLength)
               fs.read(fd, fnBuf, 0, filenameLength, offset + 30, function(err){
                 if(err) return sendError(err)
-                var cfilename = fnBuf.toString()
-                var stream = fs.createReadStream(null, {fd:fd, start: offset + headerSize, end: offset + headerSize + csize})
+                var cfilename = fnBuf.toString().split(/\//g).reverse()[0]
+                var stream = fs.createReadStream(null, {fd:fd, start: offset + headerSize, end: offset + headerSize + csize - 1})
                 if(compressionId == 0){// uncompressed
                   res.setHeader('ETag', ETag)
                   res.setHeader('Content-Type', mime.lookup(cfilename))
                   res.setHeader('Content-Length', usize)
                   stream.pipe(res)
                 } else if(compressionId == 0x8){
-                  if(decompress){
+                  var encodings = req.headers['accept-encoding'] || ''
+                  if(!encodings.match(/\bgzip\b/)){
                     res.setHeader('ETag', ETag)
                     res.setHeader('Content-Type', mime.lookup(cfilename))
                     res.setHeader('Content-Length', usize)
@@ -74,21 +75,17 @@ function CbzFile(root, decompress){
                     stream.pipe(inflate)
                     inflate.pipe(res)
                   } else {
-                    var encodings = req.headers['accept-encoding'] || ''
-                    if(!encodings.match(/\bgzip\b/)){
-                      return sendError('Gzip encoding not supported')
-                    }
-                    var headerBuffer = new Buffer(10)// + header.fileName.length + 1)
+                    var headerBuffer = new Buffer(10)// + cfilename.length + 1)
                     headerBuffer.writeUInt16LE(0x8b1f, 0, true)
                     headerBuffer.writeUInt8(0x8, 2, true)//compression type deflate
                     headerBuffer.writeUInt8(0x0, 3, true)//no filename
                     headerBuffer.writeUInt32LE(~~(Date.now() / 1000), 4, true)//timestamp
                     headerBuffer.writeUInt8(0x3, 9, true) //OS type unix
-                    //new Buffer(header.fileName).copy(headerBuffer,10)
+                    //new Buffer(cfilename).copy(headerBuffer,10)
 
                     var footerBuffer = new Buffer(8)
-                    footerBuffer.writeUInt32LE(0, crc32, true)
-                    footerBuffer.writeUInt32LE(4, usize, true)
+                    footerBuffer.writeUInt32LE(crc32, 0, true)
+                    footerBuffer.writeUInt32LE(usize, 4, true)
                     res.setHeader('ETag', ETag)
                     res.setHeader('Content-Encoding', 'gzip')
                     res.setHeader('Content-Type', mime.lookup(cfilename))

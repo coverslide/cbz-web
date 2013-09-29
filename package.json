@@ -1,11 +1,10 @@
 {
   "name": "cbz-web",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "description": "Simple remote cbz viewer",
   "main": "index.js",
   "dependencies": {
     "send": "~0.1.0",
-    "mkee": "0.0.3",
     "mime": "~1.2.9",
     "sort_by": "0.0.2",
     "domready": "~0.2.11",
