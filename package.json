@@ -1,6 +1,6 @@
 {
   "name": "cbz-web",
-  "version": "3.2.1",
+  "version": "3.3.0",
   "description": "Simple remote cbz viewer",
   "main": "index.js",
   "dependencies": {
