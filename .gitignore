@@ -1,4 +1,6 @@
-node_modules
-config.json
-public/script.js
-db
+/node_modules
+/config/default.json
+/tmp
+!/tmp/.keep
+/public
+!/public/.keep
